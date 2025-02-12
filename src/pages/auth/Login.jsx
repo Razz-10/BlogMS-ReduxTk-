@@ -3,12 +3,14 @@ import Form from './components/form/form'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import { baseUrl } from '../../config'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import STATUSES from '../../globals/status/statuses'
+import { setStatus,login } from '../../../store/authSlice'
 
 const Login = () => {
    
     const navigate= useNavigate()
+    const dispatch = useDispatch()
 
 
 
@@ -22,7 +24,9 @@ const Login = () => {
    useEffect(()=>{
 
     if(status === STATUSES.SUCCESS){
-        return navigate('/')
+
+        navigate('/')
+        dispatch(setStatus(null))
     }
 
    },[status])

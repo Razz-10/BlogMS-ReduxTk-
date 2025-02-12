@@ -3,7 +3,7 @@ import Form from './components/form/form'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import { baseUrl } from '../../config'
-import { register } from '../../../store/authSlice'
+import { register, setStatus } from '../../../store/authSlice'
 import { useDispatch,useSelector } from 'react-redux'
 import STATUSES from '../../globals/status/statuses'
 
@@ -14,21 +14,23 @@ const Register = () => {
     
     const handelRegister= (data)=>{
         dispatch(register(data))
-        
-
     }
-
     useEffect(()=>{
            //check status value from authSlice.js
+       
         if(status === STATUSES.SUCCESS){
-            return navigate('/login')
+             setTimeout(()=>navigate('/login'),0)
+            // navigate('/login')
+             dispatch(setStatus(null))
+
+
         }
         else{
-            return navigate('/register')
+            navigate('/register')
         }
 
     },[status])
-    
+
   return (
     
    

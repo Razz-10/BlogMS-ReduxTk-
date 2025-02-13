@@ -1,13 +1,13 @@
 import STATUSES from "../src/globals/status/statuses";
 import API from "../src/http";
-import reducer, { setStatus, setToken } from "./authSlice";
 import { createSlice } from "@reduxjs/toolkit";
 
 const blogSlice = createSlice({
     name: 'blog',
-    initalState :{
+    initialState :{
 
-        data :null,
+        blogs :[],
+        blog :{},
         status : null,
         
     },
@@ -16,18 +16,22 @@ const blogSlice = createSlice({
         setStatus(state,action){
             state.status = action.payload
         },
+        setBlogs(state,action){
+            state.blogs = action.payload
+        },
+        
         setBlog(state,action){
-            state.data = action.payload
+            state.blog = action.payload
         }
         
-    }
-})
+    },
+});
 
 
-export const {setBlog,setStatus}=blogSlice.actions
+export const {setStatus,setBlogs,setBlog}= blogSlice.actions
 export default blogSlice.reducer
 
-export function AddBlog(data){
+export function addBlog(data){
     return async function addBlogThunk(dispatch){
         dispatch(setStatus(STATUSES.LOADING));
         try {
@@ -35,10 +39,15 @@ export function AddBlog(data){
                 {
                     headers:{
                         'Content-Type' :'multipart/form-data'
+                        
                 }
             }
             );
             if(response.status === 201){
+                console.log('createblog sucess')
+
+                dispatch(setBlogs(response.data.data))
+                
                 dispatch(setStatus(STATUSES.SUCCESS))
             }
             else{
@@ -52,11 +61,18 @@ export function AddBlog(data){
 export function fetchBlog(data){
     return async function fetchBlogThunk(dispatch){
         dispatch(setStatus(STATUSES.LOADING));
+        
         try {
             const response = await API.get('blog')
-            if(response.status === 200 && response.data.blog.length >0 ){
-                dispatch(setBlog(response.data.blog))
+            if(response.status === 200 && response.data.data.length >0 ){
+                const blogs =response.data.data;
+
+                dispatch(setBlogs(blogs))
+               
+                // dispatch(setBlogs(response.data.data))
                 dispatch(setStatus(STATUSES.SUCCESS))
+                
+                
             }
             else{
                 dispatch(setStatus(STATUSES.ERROR))
@@ -66,30 +82,93 @@ export function fetchBlog(data){
         }
     }
 }
-export function deleteBlog(id,token){
-    return async function deleteBlogThunk(dispatch){
-        dispatch(setStatus(STATUSES.LOADING))
+export function singleBlog(id){
+    return async function singleBlogThunk(dispatch){
+        dispatch(setStatus(STATUSES.LOADING));
         try {
-
-            const response = await API.delete(`blog/${id}`,{
-                headers : {
-                    token : token
-                }
-            })
-
-            if (response.status ===200){
+            const response = await API.get(`blog/${id}`)
+            if (response.status === 200){
+                
                 dispatch(setStatus(STATUSES.SUCCESS))
-
+                dispatch(setBlog(response.data.data))
+    
             }
-            else{
+            else {
                 dispatch(setStatus(STATUSES.ERROR))
             }
             
         } catch (error) {
+            dispatch(setStatus(STATUSES.ERROR))
+
+            
+        }
+
+    }
+}
+
+
+export function deleteBlog(id){
+    return async function deleteBlogThunk(dispatch,getState){
+        dispatch(setStatus(STATUSES.LOADING))
+        try {
+
+            const response = await API.delete(`blog/${id}`)
+
+            if (response.status ===200){
+                //getting currentlist of blogs from redux state
+                
+                const currentBlogs = getState().blog.blogs;
+                
+                // Remove the deleted blog from the list
+                const updatedBlogs = currentBlogs.filter(blog=>blog.id !==id);
+
+                dispatch(setBlogs(updatedBlogs));
+
+                dispatch(setStatus(STATUSES.SUCCESS))
+                
+
+            }
+         
+            
+        } catch (error) {
+            
              dispatch(setStatus(STATUSES.ERROR))
             
         }
  
 
+    }
+}
+export function editBlog(data,id){
+    return async function editBlogThunk(dispatch){
+        dispatch(setStatus(STATUSES.LOADING))
+
+        try {
+
+            const response = await API.patch(`blog/${id}`,data,{
+                headers :{
+                    "Content-Type" :'multipart/form-data',
+                }
+            })
+            if (response.status === 200){
+                
+                dispatch(setBlog(data))
+
+                dispatch(setStatus(STATUSES.SUCCESS))
+
+
+                
+            }
+            else {
+               
+                alert("YOu are not a author")
+            }
+
+            
+        } catch (error) {
+            console.log(error)
+            dispatch(setStatus(STATUSES.ERROR))
+            
+        }
     }
 }

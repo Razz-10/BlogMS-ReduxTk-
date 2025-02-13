@@ -3,47 +3,44 @@ import Layout from '../../components/layout/Layout'
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
 import axios from 'axios'
 import { baseUrl } from '../../config'
+import { useDispatch, useSelector } from 'react-redux'
+import { singleBlog,deleteBlog } from '../../../store/blogSlice'
+import { use } from 'react'
+import STATUSES from '../../globals/status/statuses'
+import { setStatus } from '../../../store/authSlice'
 
 const SingleBlog = () => {
-     const {id} =useParams()
-     const [blog,setBlog] = useState({})
+    const {id} =useParams();
      const navigate =useNavigate()
+     const dispatch = useDispatch()
+     const {blog,status} = useSelector((state)=>state.blog)
+       
+        useEffect(()=>{
+            dispatch(singleBlog(id))
+        },[dispatch])
 
-     const deleteblog =async()=>{
-        try {
-            
-            const response = await axios.delete(`${baseUrl}/blog/${id}`,{
-                headers : {
-                    "Authorization" :localStorage.getItem('token')
-                }
-            }
+
+
+const deleteblog =()=>{
+
     
-            )
-            if(response.status ===200){
-                navigate('/')
-            }else{
-                alert("something went Wrong.Try again !!")
-            }
-        } catch (error) {
-            alert(error?.response?.data?.message)
-            
-        }
+    dispatch(deleteBlog(id))
 
-          
-
+     if (status === STATUSES.SUCCESS){
+        navigate('/');
+        dispatch(setStatus(null))
+     }
+     else{
+        alert("blog is not deleted");
      }
 
+        
+ 
+};
 
-     const fetchBlog =async()=>{
-        const response = await axios.get(`${baseUrl}/blog/${id}`)
-            if(response.status ===200){
-                setBlog(response.data.data)
 
-            }
-        }
-    useEffect(()=>{
-        fetchBlog()
-    },[])
+
+  
         
 
      
@@ -64,7 +61,7 @@ const SingleBlog = () => {
                     </Link>
                     </div>
                     <div className="w-1/2 px-2">
-                        <button className="w-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-4 rounded-full font-bold hover:bg-gray-300 dark:hover:bg-gray-600" onClick={deleteblog}>Delete</button>
+                        <button className="w-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-4 rounded-full font-bold hover:bg-gray-300 dark:hover:bg-gray-600" onClick={deleteblog} >Delete</button>
                     </div>
                 </div>
             </div>

@@ -5,53 +5,54 @@ import { use, } from 'react'
 import {useNavigate, useParams } from 'react-router-dom'
 import axios from 'axios'
 import { baseUrl } from '../../config'
+import { useDispatch, useSelector } from 'react-redux'
+import { editBlog,setStatus } from '../../../store/blogSlice'
+import STATUSES from '../../globals/status/statuses'
+
 
 const EditBlog = () => {
   const navigate = useNavigate()
   const {id}=useParams()
-  const[blog,setBlog]=useState({})
+  const dispatch = useDispatch()
+  const {status,blog} = useSelector((state)=>state.blog)
   
-  const handelEditBlog = async(data)=>{
+  
+  const handelEditBlog = (data)=>{
 
-      try {
-      const response =  await axios.patch(`${baseUrl}/blog/${id}`,data,{
-        headers:{
-          "Content-Type" :'multipart/form-data',
-          "Authorization" :localStorage.getItem('token')
-        }
-      })
+     dispatch(editBlog(data,id))
+
+     if (status === STATUSES.SUCCESS){
+      // navigate('/blog/'+id)
+    
+      navigate('/')
+
+      dispatch(setStatus(null))
+     }
       
-      if (response.status ===200){
-        console.log(response.data)
-        navigate('/')
-        // navigate('/blog/'+id)
-      }
-      else{
-        alert("something went wrong")
-      }
+     
+      
+      
+    
   
     }
     
-   catch (error) {
-    alert(error?.response?.data?.message)
-    
-   }
-  }
+
+  
  
-  const fetchBlog= async()=>{
-    const response = await axios.get(`${baseUrl}/blog/${id}`)
+  // const fetchBlog= async()=>{
+  //   const response = await axios.get(`${baseUrl}/blog/${id}`)
     
   
-    if (response.status ===200){
-      setBlog(response.data.data)
+  //   if (response.status ===200){
+  //     setBlog(response.data.data)
       
 
-    }
+  //   }
 
-  }
-  useEffect(()=>{
-    fetchBlog()
-  },[id])
+  // }
+  // useEffect(()=>{
+  //   fetchBlog()
+  // },[id])
  
   return (
     <Layout>

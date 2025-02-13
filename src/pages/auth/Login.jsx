@@ -14,7 +14,7 @@ const Login = () => {
 
 
 
-    const {user,status} =useSelector((state)=>state.auth)
+    const {user,status,token} =useSelector((state)=>state.auth)
 
 
     const handelLogin=(data)=>{
@@ -24,9 +24,9 @@ const Login = () => {
    useEffect(()=>{
 
     if(status === STATUSES.SUCCESS){
-
-        navigate('/')
-        dispatch(setStatus(null))
+      navigate('/')
+      dispatch(setStatus(null))
+      localStorage.setItem('jwt',token)
     }
 
    },[status])

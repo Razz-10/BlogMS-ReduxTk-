@@ -36,7 +36,7 @@ const Form = ({type,user,onSubmit}) => {
           <div>
             <h1 className="text-2xl font-semibold">{type =='login'? 'Login Here to continue ...' : 'Register Here to continue ...'}</h1>
           </div>
-          {type ==='login' && `Hello,${user?.username}` }
+          {type ==='login' && (user ?`Hello,${user.username}` :"Hello Please Login ..") }
          
           <form onSubmit={handelSubmit}>
           <div className="divide-y divide-gray-200">

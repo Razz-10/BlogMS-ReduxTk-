@@ -14,6 +14,7 @@ const SingleBlog = () => {
      const navigate =useNavigate()
      const dispatch = useDispatch()
      const {blog,status} = useSelector((state)=>state.blog)
+    
        
         useEffect(()=>{
             dispatch(singleBlog(id))
@@ -37,14 +38,6 @@ const deleteblog =()=>{
         
  
 };
-
-
-
-  
-        
-
-     
-
   return (
     <Layout>
         <div className="bg-gray-100 h-screen dark:bg-gray-800 py-8">
